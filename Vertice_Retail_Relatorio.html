@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projeto Vértice — Diagnóstico, Evidências e Business Case</title>
+<style>
+  :root {
+    --ink: #131920;
+    --muted: #656871;
+    --muted-light: #9ca3af;
+    --paper: #ffffff;
+    --bg-base: #faf9fc;
+    --primary: #4200db;
+    --primary-dark: #2a0090;
+    --primary-light: #8575ff;
+    --primary-bg: #eeecff;
+    --border: #e5e2f0;
+    --success: #00802f;
+    --success-bg: #e6f5eb;
+    --warning: #b8790a;
+    --warning-bg: #fef3d9;
+    --danger: #db0000;
+    --danger-bg: #fceaea;
+    --pending: #7a7d85;
+    --pending-bg: #eeeef0;
+    --radius: 14px;
+    --shadow-sm: 0 1px 3px rgba(19,25,32,.06);
+    --shadow-md: 0 8px 24px rgba(42,0,144,.10);
+    --shadow-lg: 0 16px 40px rgba(42,0,144,.16);
+    --font-display: "Amazon Ember", "Helvetica Neue", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-body: "Amazon Ember", "Helvetica Neue", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: "SF Mono", "Monaco", "Menlo", "Consolas", monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    background: var(--bg-base);
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--primary); }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    position: relative;
+    background: linear-gradient(135deg, #2a0090 0%, #4200db 46%, #6a3df0 78%, #8575ff 100%);
+    color: #fff;
+    padding: 64px 40px 56px;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 85% 15%, rgba(255,255,255,.14), transparent 40%),
+      radial-gradient(circle at 10% 90%, rgba(255,255,255,.10), transparent 45%);
+    pointer-events: none;
+  }
+  .hero-inner { position: relative; max-width: 1080px; margin: 0 auto; }
+  .hero .eyebrow {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: .3px;
+    opacity: .85;
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -.015em;
+    font-size: 42px;
+    line-height: 1.16;
+    margin: 0 0 14px;
+    max-width: 680px;
+  }
+  .hero p.lede {
+    font-size: 16px;
+    max-width: 560px;
+    opacity: .92;
+    margin: 0 0 36px;
+  }
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+    max-width: 900px;
+  }
+  .stat-pill {
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.22);
+    backdrop-filter: blur(6px);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    transition: transform .18s ease, background .18s ease;
+  }
+  .stat-pill:hover {
+    transform: translateY(-3px);
+    background: rgba(255,255,255,.16);
+  }
+  .stat-pill .num {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 25px;
+    background: linear-gradient(90deg, #fff, #d9d2ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .stat-pill .lbl { font-size: 12px; opacity: .85; margin-top: 3px; }
+
+  /* ---------- NAV ---------- */
+  nav.toc {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(250,249,252,.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 40px;
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+    font-size: 13.5px;
+  }
+  nav.toc a {
+    color: var(--muted);
+    text-decoration: none;
+    font-weight: 600;
+    padding-bottom: 3px;
+    border-bottom: 2px solid transparent;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  nav.toc a:hover { color: var(--primary); border-color: var(--primary-light); }
+
+  .container { max-width: 1080px; margin: 0 auto; padding: 48px 40px 100px; }
+  section { margin-bottom: 64px; scroll-margin-top: 70px; }
+  section h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -.01em;
+    font-size: 24px;
+    color: var(--primary-dark);
+    margin-bottom: 22px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  section h2 .num-marker {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--primary);
+    border-radius: 999px;
+    width: 26px; height: 26px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  section h3 { font-size: 15.5px; color: var(--ink); margin: 26px 0 12px; font-weight: 700; }
+
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 22px 26px;
+    margin-bottom: 16px;
+    transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease;
+  }
+  .card:hover { box-shadow: var(--shadow-md); border-color: var(--primary-light); }
+
+  /* ---------- DELIVERABLES GRID ---------- */
+  .deliv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 16px;
+  }
+  .deliverable-card {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 20px 22px;
+    box-shadow: var(--shadow-sm);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    position: relative;
+  }
+  .deliverable-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-light);
+  }
+  .deliverable-card h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15.5px;
+    margin: 10px 0 8px;
+    color: var(--ink);
+  }
+  .deliverable-card p {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+  }
+  .deliverable-status {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 11px;
+    border-radius: 999px;
+    letter-spacing: .3px;
+  }
+  .status-done .deliverable-status { background: var(--success-bg); color: var(--success); }
+  .status-done { border-top: 3px solid var(--success); }
+  .status-partial .deliverable-status { background: var(--warning-bg); color: var(--warning); }
+  .status-partial { border-top: 3px solid var(--warning); }
+  .status-pending .deliverable-status { background: var(--pending-bg); color: var(--pending); }
+  .status-pending { border-top: 3px dashed #c7c9d1; }
+
+  /* ---------- KPI ---------- */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .kpi {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 20px 22px;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .kpi:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+  .kpi .value {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 26px;
+    background: linear-gradient(90deg, var(--primary-dark), var(--primary-light));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .kpi .label { font-size: 12.5px; color: var(--muted); margin-top: 5px; }
+
+  /* ---------- TABLE ---------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--paper);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    font-size: 13.5px;
+  }
+  th {
+    background: var(--primary-dark);
+    color: #fff;
+    text-align: left;
+    padding: 11px 15px;
+    font-weight: 600;
+    font-size: 12.5px;
+  }
+  td { padding: 11px 15px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background .12s ease; }
+  tbody tr:hover td { background: var(--primary-bg); }
+  code { font-family: var(--font-mono); font-size: 12px; background: var(--primary-bg); padding: 1px 5px; border-radius: 4px; color: var(--primary-dark); }
+
+  .badge {
+    display: inline-block; font-size: 10.5px; font-weight: 700;
+    padding: 3px 10px; border-radius: 999px; letter-spacing: .3px;
+  }
+  .badge.confirmada { background: var(--success-bg); color: var(--success); }
+  .badge.refutada { background: var(--danger-bg); color: var(--danger); }
+  .badge.parcial { background: var(--warning-bg); color: var(--warning); }
+  .badge.quickwin { background: var(--success-bg); color: var(--success); }
+  .badge.estruturante { background: var(--primary-bg); color: var(--primary-dark); }
+
+  /* ---------- HYPOTHESIS ---------- */
+  .hyp {
+    border-left: 4px solid var(--border);
+    padding: 12px 18px;
+    margin-bottom: 10px;
+    background: var(--paper);
+    border-radius: 0 10px 10px 0;
+    box-shadow: var(--shadow-sm);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .hyp:hover { transform: translateX(3px); box-shadow: var(--shadow-md); }
+  .hyp.confirmada { border-left-color: var(--success); }
+  .hyp.refutada { border-left-color: var(--danger); }
+  .hyp.parcial { border-left-color: var(--warning); }
+  .hyp .hyp-title { font-weight: 700; margin-bottom: 4px; font-size: 14px; }
+  .hyp p, .hyp { font-size: 13.5px; color: var(--muted); }
+
+  .callout {
+    background: var(--primary-bg);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    font-size: 14px;
+    color: var(--primary-dark);
+    border: 1px solid var(--primary-light);
+  }
+  .callout.warning { background: var(--warning-bg); border-color: #eccf8a; color: #6b4d05; }
+
+  .chart-block {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 18px 20px 10px;
+    margin-bottom: 18px;
+    transition: box-shadow .18s ease;
+  }
+  .chart-block:hover { box-shadow: var(--shadow-md); }
+  .chart-title { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+  .bar-rect { transition: opacity .15s ease; }
+  .bar-rect:hover { opacity: .82; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 720px) { .two-col { grid-template-columns: 1fr; } .hero h1 { font-size: 32px; } }
+
+  .footer-note {
+    font-size: 12px; color: var(--muted-light);
+    border-top: 1px solid var(--border);
+    padding-top: 18px; margin-top: 48px;
+  }
+  .dashboard-embed {
+    background: var(--paper);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--muted-light);
+    font-size: 14px;
+    transition: border-color .18s ease;
+  }
+  .dashboard-embed:hover { border-color: var(--primary-light); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">BootCamp Nova Geração · Projeto Vértice · EloGroup 2026</div>
+    <h1>Diagnóstico, evidências e plano de recuperação de margem para a Vértice Retail</h1>
+    <p class="lede">Consultoria de dados e IA para responder à diretoria: como recuperar rentabilidade e produtividade nos próximos 90 dias.</p>
+    <div class="stat-row">
+      <div class="stat-pill"><div class="num">R$2-3 Mi</div><div class="lbl">Impacto anual defensável</div></div>
+      <div class="stat-pill"><div class="num">R$8,65 Mi</div><div class="lbl">Capital liberável em estoque</div></div>
+      <div class="stat-pill"><div class="num">14</div><div class="lbl">Hipóteses testadas</div></div>
+      <div class="stat-pill"><div class="num">7,5x</div><div class="lbl">ChatBot mais barato que canais humanos</div></div>
+    </div>
+  </div>
+</div>
+
+<nav class="toc">
+  <a href="#entregaveis">Entregáveis</a>
+  <a href="#diagnostico">Diagnóstico</a>
+  <a href="#hipoteses">Hipóteses</a>
+  <a href="#insights">Insights</a>
+  <a href="#evidencias">Evidências</a>
+  <a href="#oportunidades">Oportunidades</a>
+  <a href="#solucoes">Soluções (IA)</a>
+  <a href="#business-case">Business Case</a>
+  <a href="#dashboard">Dashboard</a>
+</nav>
+
+<div class="container">
+
+  <section id="entregaveis">
+    <h2><span class="num-marker">0</span>Entregáveis do case</h2>
+    <p style="color:var(--muted); font-size:14px; margin-top:-10px;">Raio-x de onde a squad está em relação aos 8 entregáveis oficiais do case — marcado mesmo o que ainda não foi iniciado, pra rastrear o que falta.</p>
+    <div class="deliv-grid">
+      
+      <div class="deliverable-card status-done">
+        <div class="deliverable-status">Concluído</div>
+        <h3>Diagnóstico executivo</h3>
+        <p>Explicação clara do problema, árvore de hipóteses, principais causas e tamanho das oportunidades.</p>
+      </div>
+      <div class="deliverable-card status-done">
+        <div class="deliverable-status">Concluído</div>
+        <h3>Análises e insights</h3>
+        <p>Principais descobertas suportadas por dados, com premissas explícitas e interpretação de negócio.</p>
+      </div>
+      <div class="deliverable-card status-done">
+        <div class="deliverable-status">Concluído</div>
+        <h3>Dashboard de gestão</h3>
+        <p>Painel com indicadores-chave para a diretoria acompanhar margem, canais, clientes, operação e atendimento.</p>
+      </div>
+      <div class="deliverable-card status-pending">
+        <div class="deliverable-status">Pendente</div>
+        <h3>Protótipo ou demonstração de IA</h3>
+        <p>Analisador de funil, classificador, automação, gerador de relatório ou priorizador demonstrável.</p>
+      </div>
+      <div class="deliverable-card status-partial">
+        <div class="deliverable-status">Parcial</div>
+        <h3>Business case</h3>
+        <p>Estimativa de impacto financeiro e operacional: receita protegida, margem recuperada, economia, esforço e payback.</p>
+      </div>
+      <div class="deliverable-card status-pending">
+        <div class="deliverable-status">Pendente</div>
+        <h3>Roadmap 30-60-90 dias</h3>
+        <p>Plano de implementação com quick wins, iniciativas estruturais, responsáveis, dependências e KPIs.</p>
+      </div>
+      <div class="deliverable-card status-partial">
+        <div class="deliverable-status">Parcial</div>
+        <h3>Governança e riscos</h3>
+        <p>Riscos de dados, privacidade, vieses, alucinação, adoção pelo time e controles necessários.</p>
+      </div>
+      <div class="deliverable-card status-pending">
+        <div class="deliverable-status">Pendente</div>
+        <h3>Apresentação Final</h3>
+        <p>Apresentação para a diretoria com diagnóstico, recomendações, demonstração e plano de ação.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="diagnostico">
+    <h2><span class="num-marker">1</span>Diagnóstico do negócio</h2>
+    <div class="card">
+      <p>A margem de contribuição agregada é <strong>54,4%</strong> e está <strong>estável</strong> ao longo do período coberto pelos dados — não há erosão generalizada de margem. Isso muda o enquadramento do problema: <strong>a queda de rentabilidade não é um problema de margem média, é um problema de alocação</strong>. A empresa investe e opera de forma parecida em canais, produtos e processos que performam de maneira muito diferente entre si.</p>
+      <p>Três frentes concentram essa má alocação: <strong>Marketing</strong> (ROAS de 3,0x a 7,7x entre canais), <strong>Atendimento</strong> (custo por ticket de R$2 a R$45 pro mesmo tipo de problema) e <strong>Estoque</strong> (R$8,65 milhões em capital parado em SKUs críticos/ruptura).</p>
+    </div>
+    <div class="callout warning">
+      <strong>Nota sobre 2024:</strong> a base de Vendas cobre só até 26/01/2024. Qualquer comparação "2023 vs 2024" sem ajustar por dias é enganosa (parece queda de 96%, mas comparando os mesmos 26 primeiros dias de janeiro, a receita está +1,1% e os pedidos +5,3%). O negócio está estável, não em declínio.
+    </div>
+  </section>
+
+  <section id="hipoteses">
+    <h2><span class="num-marker">2</span>Árvore de hipóteses</h2>
+
+    <div class="hyp refutada">
+      <div class="hyp-title">H1 · Crescimento com pior qualidade de margem <span class="badge refutada">Refutada</span></div>
+      Margem estável em 54,4%, sem tendência de queda. A margem varia por <em>canal</em> (51,4% a 55,6%), não caiu ao longo do tempo.
+    </div>
+    <div class="hyp refutada">
+      <div class="hyp-title">H1b · A margem se deteriora por categoria/mix de produto <span class="badge refutada">Refutada</span></div>
+      Margem por categoria no mesmo patamar: Moda 54,5% · Acessórios 54,5% · Beleza 54,4% · Lifestyle 54,1% — variação de apenas 0,4 p.p.
+    </div>
+    <div class="hyp confirmada">
+      <div class="hyp-title">H2 · Nem todo canal de aquisição gera crescimento sustentável <span class="badge confirmada">Confirmada</span></div>
+      Marketplace tem a pior margem (51,4%) E o pior ROAS (~3,0x) simultaneamente. Influenciador tem o melhor ROAS (7,6-7,7x) e margem acima da média — contraria a hipótese-exemplo do case.
+    </div>
+    <div class="hyp parcial">
+      <div class="hyp-title">H3 · Falhas operacionais destroem valor pós-venda <span class="badge parcial">Parcial</span></div>
+      Devolução uniforme entre canais (~14-15%). Mas ruptura/estoque crítico atinge 800 SKUs e R$8,65 Mi em capital parado.
+    </div>
+    <div class="hyp confirmada">
+      <div class="hyp-title">H4 · Atendimento concentra sintomas de problemas recorrentes <span class="badge confirmada">Confirmada</span></div>
+      "Onde está meu pedido?" é o maior volume (10.765 tickets) e maior custo total (R$159,7 mil), CSAT baixo (2,99). Aponta pra causa raiz logística/informacional.
+    </div>
+    <div class="hyp confirmada">
+      <div class="hyp-title">H5 · Segmentos de clientes têm valor muito diferente <span class="badge confirmada">Confirmada</span></div>
+      LTV médio varia de R$2.666 (Hibernando) a R$26.671 (Campeão) — 10x de diferença. "Promissor" (cliente novo) gera 2x mais tickets de suporte que "Fiel".
+    </div>
+    <div class="hyp confirmada">
+      <div class="hyp-title">H14 · Fornecedores com lead time mais longo geram mais ruptura <span class="badge confirmada">Confirmada</span></div>
+      Fornecedores com lead time &gt;50 dias concentram 24-34% de SKUs críticos/ruptura, contra ~22% nos de lead time curto (~10 dias).
+    </div>
+
+    <h3>Hipóteses adicionais testadas (descartar também é evidência)</h3>
+    <div class="hyp refutada"><div class="hyp-title">H7 · Atraso na entrega explica a devolução <span class="badge refutada">Refutada</span></div>Tempo de entrega médio é praticamente igual entre pedidos devolvidos (8,4 dias) e não devolvidos (8,3 dias).</div>
+    <div class="hyp refutada"><div class="hyp-title">H8 · Responder mais rápido aumenta a satisfação <span class="badge refutada">Refutada</span></div>Correlação entre tempo de primeira resposta e CSAT é de apenas 0,015 — praticamente zero.</div>
+    <div class="hyp refutada"><div class="hyp-title">H9 · Método de pagamento afeta aprovação/cancelamento <span class="badge refutada">Refutada</span></div>Taxa de aprovação (~88%) e cancelamento (~8%) é uniforme entre Cartão, Boleto e PIX.</div>
+    <div class="hyp refutada"><div class="hyp-title">H10 · Há fadiga de campanha de marketing ao longo do tempo <span class="badge refutada">Refutada</span></div>ROAS oscila entre 3,8x-4,5x mês a mês sem tendência de queda.</div>
+    <div class="hyp refutada"><div class="hyp-title">H11 · Desconto agressivo atrai comprador que mais devolve <span class="badge refutada">Refutada</span></div>Taxa de devolução é ~14-15% em todas as faixas de desconto (de 0-5% a acima de 30%).</div>
+    <div class="hyp refutada"><div class="hyp-title">H12 · Cliente de renda mais alta compra ticket médio maior <span class="badge refutada">Refutada</span></div>Ticket médio é praticamente idêntico entre os 4 quartis de renda estimada (R$676 a R$683).</div>
+    <div class="hyp refutada"><div class="hyp-title">H13 · Há sazonalidade forte por dia da semana <span class="badge refutada">Refutada</span></div>Volume de pedidos varia menos de 8% entre o dia mais forte (sexta) e o mais fraco (sábado/segunda).</div>
+    <div class="hyp parcial"><div class="hyp-title">H6 · Ineficiência de informação/gargalos de decisão <span class="badge parcial">A investigar</span></div>Não há dado direto sobre horas/processos manuais no Data Room — fica como hipótese qualitativa a validar com a diretoria.</div>
+  </section>
+
+  <section id="insights">
+    <h2><span class="num-marker">3</span>Principais insights</h2>
+    <table>
+      <tr><th>#</th><th>Insight</th><th>Evidência</th><th>Implicação</th></tr>
+      <tr><td>1</td><td>Automação de atendimento tem ROI claro</td><td>ChatBot custa R$2,00/ticket vs R$15-45 nos demais canais, CSAT equivalente</td><td>Migrar volume para ChatBot/RAG</td></tr>
+      <tr><td>2</td><td>Marketplace é o canal a desinvestir</td><td>Pior margem (51,4%) e pior ROAS (~3,0x) simultaneamente</td><td>Realocar investimento</td></tr>
+      <tr><td>3</td><td>Influenciador é o canal a expandir</td><td>Melhor ROAS (7,6-7,7x), margem acima da média</td><td>Contraria hipótese "óbvia" do case</td></tr>
+      <tr><td>4</td><td>"Onde está meu pedido?" é o maior dreno de custo</td><td>10.765 tickets, R$159,7 mil, CSAT 2,99</td><td>Causa raiz é rastreio, não atendimento</td></tr>
+      <tr><td>5</td><td>R$8,65 Mi em capital parado em estoque</td><td>701 SKUs críticos + 99 em ruptura</td><td>Priorizar reposição por valor parado</td></tr>
+      <tr><td>6</td><td>Segmento "Em Risco" é o maior bolso ameaçado</td><td>3.269 clientes, LTV médio R$5.403</td><td>Retenção direcionada</td></tr>
+      <tr><td>7</td><td>Cliente novo gera 2x mais tickets que fiel</td><td>Promissor: 4,16 tickets/cliente vs Fiel: 2,01</td><td>Revisar onboarding (30-60 dias)</td></tr>
+      <tr><td>8</td><td>Margem por categoria é estável</td><td>Moda/Acessórios/Beleza/Lifestyle variam só 0,4 p.p. entre si</td><td>Hipótese refutada — foco deve ser canal, não categoria</td></tr>
+    </table>
+  </section>
+
+  <section id="evidencias">
+    <h2><span class="num-marker">4</span>Evidências — a conta por trás dos números</h2>
+    <p style="color:var(--muted); font-size:14px; margin-top:-10px;">Cada gráfico é gerado direto das colunas brutas do Data Room — a fonte e o cálculo estão descritos abaixo de cada um.</p>
+
+    <div class="chart-block">
+      <div class="chart-title">Custo médio por ticket, por canal de atendimento (R$)</div>
+      <svg viewBox="0 0 760 260" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#8575FF"/>
+            <stop offset="100%" stop-color="#4200DB"/>
+          </linearGradient>
+        </defs>
+        <line x1="10" y1="214" x2="750" y2="214" stroke="#e5e2f5" stroke-width="1"/>
+        <rect x="10.0" y="206.9" width="133.6" height="7.1" rx="6" fill="#00802F" class="bar-rect"><title>ChatBot: R$ 2,00</title></rect><text x="76.8" y="198.9" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 2,00</text><text x="76.8" y="232.0" text-anchor="middle" font-size="11" fill="#656871">ChatBot</text><rect x="161.6" y="160.7" width="133.6" height="53.3" rx="6" fill="url(#g1)" class="bar-rect"><title>E-mail: R$ 15,00</title></rect><text x="228.4" y="152.7" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 15,00</text><text x="228.4" y="232.0" text-anchor="middle" font-size="11" fill="#656871">E-mail</text><rect x="313.2" y="160.7" width="133.6" height="53.3" rx="6" fill="url(#g1)" class="bar-rect"><title>Telefone: R$ 15,00</title></rect><text x="380.0" y="152.7" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 15,00</text><text x="380.0" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Telefone</text><rect x="464.8" y="160.7" width="133.6" height="53.3" rx="6" fill="url(#g1)" class="bar-rect"><title>WhatsApp: R$ 15,00</title></rect><text x="531.6" y="152.7" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 15,00</text><text x="531.6" y="232.0" text-anchor="middle" font-size="11" fill="#656871">WhatsApp</text><rect x="616.4" y="54.0" width="133.6" height="160.0" rx="6" fill="url(#g1)" class="bar-rect"><title>Reclame Aqui: R$ 45,00</title></rect><text x="683.2" y="46.0" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 45,00</text><text x="683.2" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Reclame Aqui</text>
+      </svg>
+    </div>
+    <p style="font-size:12.5px; color:var(--muted-light); margin-top:-10px;">Fonte: base Atendimento (35.841 tickets), coluna <code>custo_operacional_ticket</code>, agrupada por <code>canal_entrada</code>.</p>
+
+    <div class="two-col">
+      <div><div class="chart-block">
+      <div class="chart-title">Margem de contribuição (%) por canal</div>
+      <svg viewBox="0 0 760 260" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#8575FF"/>
+            <stop offset="100%" stop-color="#4200DB"/>
+          </linearGradient>
+        </defs>
+        <line x1="10" y1="214" x2="750" y2="214" stroke="#e5e2f5" stroke-width="1"/>
+        <rect x="10.0" y="54.1" width="90.3" height="159.9" rx="6" fill="url(#g2)" class="bar-rect"><title>Influenciador: 55,6%</title></rect><text x="55.1" y="46.1" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">55,6%</text><text x="55.1" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Influenciador</text><rect x="118.3" y="55.4" width="90.3" height="158.6" rx="6" fill="url(#g2)" class="bar-rect"><title>TikTok Ads: 55,1%</title></rect><text x="163.4" y="47.4" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">55,1%</text><text x="163.4" y="232.0" text-anchor="middle" font-size="11" fill="#656871">TikTok Ads</text><rect x="226.6" y="55.6" width="90.3" height="158.4" rx="6" fill="url(#g2)" class="bar-rect"><title>Instagram Ads: 55,0%</title></rect><text x="271.7" y="47.6" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">55,0%</text><text x="271.7" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Instagram Ads</text><rect x="334.9" y="56.2" width="90.3" height="157.8" rx="6" fill="url(#g2)" class="bar-rect"><title>Google Ads: 54,8%</title></rect><text x="380.0" y="48.2" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">54,8%</text><text x="380.0" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Google Ads</text><rect x="443.1" y="54.0" width="90.3" height="160.0" rx="6" fill="url(#g2)" class="bar-rect"><title>Email Mkt: 55,6%</title></rect><text x="488.3" y="46.0" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">55,6%</text><text x="488.3" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Email Mkt</text><rect x="551.4" y="66.0" width="90.3" height="148.0" rx="6" fill="#DB0000" class="bar-rect"><title>Marketplace: 51,4%</title></rect><text x="596.6" y="58.0" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">51,4%</text><text x="596.6" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Marketplace</text><rect x="659.7" y="55.3" width="90.3" height="158.7" rx="6" fill="url(#g2)" class="bar-rect"><title>Orgânico: 55,2%</title></rect><text x="704.9" y="47.3" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">55,2%</text><text x="704.9" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Orgânico</text>
+      </svg>
+    </div></div>
+      <div><div class="chart-block">
+      <div class="chart-title">ROAS médio reportado, por canal</div>
+      <svg viewBox="0 0 760 260" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#8575FF"/>
+            <stop offset="100%" stop-color="#4200DB"/>
+          </linearGradient>
+        </defs>
+        <line x1="10" y1="214" x2="750" y2="214" stroke="#e5e2f5" stroke-width="1"/>
+        <rect x="10.0" y="54.0" width="90.3" height="160.0" rx="6" fill="#00802F" class="bar-rect"><title>Influenciador: 7,69x</title></rect><text x="55.1" y="46.0" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">7,69x</text><text x="55.1" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Influenciador</text><rect x="118.3" y="116.8" width="90.3" height="97.2" rx="6" fill="url(#g3)" class="bar-rect"><title>TikTok Ads: 4,67x</title></rect><text x="163.4" y="108.8" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">4,67x</text><text x="163.4" y="232.0" text-anchor="middle" font-size="11" fill="#656871">TikTok Ads</text><rect x="226.6" y="121.8" width="90.3" height="92.2" rx="6" fill="url(#g3)" class="bar-rect"><title>Instagram Ads: 4,43x</title></rect><text x="271.7" y="113.8" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">4,43x</text><text x="271.7" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Instagram Ads</text><rect x="334.9" y="141.0" width="90.3" height="73.0" rx="6" fill="url(#g3)" class="bar-rect"><title>Google Ads: 3,51x</title></rect><text x="380.0" y="133.0" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">3,51x</text><text x="380.0" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Google Ads</text><rect x="443.1" y="151.6" width="90.3" height="62.4" rx="6" fill="url(#g3)" class="bar-rect"><title>Marketplace: 3,00x</title></rect><text x="488.3" y="143.6" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">3,00x</text><text x="488.3" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Marketplace</text><rect x="551.4" y="151.6" width="90.3" height="62.4" rx="6" fill="url(#g3)" class="bar-rect"><title>Email Mkt: 3,00x</title></rect><text x="596.6" y="143.6" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">3,00x</text><text x="596.6" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Email Mkt</text><rect x="659.7" y="151.8" width="90.3" height="62.2" rx="6" fill="url(#g3)" class="bar-rect"><title>Orgânico: 2,99x</title></rect><text x="704.9" y="143.8" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">2,99x</text><text x="704.9" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Orgânico</text>
+      </svg>
+    </div></div>
+    </div>
+    <p style="font-size:12.5px; color:var(--muted-light); margin-top:-10px;">Fonte: Margem % = soma de <code>margem_contribuicao</code> ÷ soma de <code>receita_liquida</code> (Vendas, 27.759 pedidos). ROAS = média de <code>roas</code> (Marketing, 3.500 campanhas), cruzadas pelo nome do canal.</p>
+
+    <div class="chart-block">
+      <div class="chart-title">LTV médio (R$), por segmento RFM</div>
+      <svg viewBox="0 0 760 260" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g4" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#8575FF"/>
+            <stop offset="100%" stop-color="#4200DB"/>
+          </linearGradient>
+        </defs>
+        <line x1="10" y1="214" x2="750" y2="214" stroke="#e5e2f5" stroke-width="1"/>
+        <rect x="10.0" y="54.0" width="108.3" height="160.0" rx="6" fill="url(#g4)" class="bar-rect"><title>Campeão: R$ 26,7k</title></rect><text x="64.2" y="46.0" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 26,7k</text><text x="64.2" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Campeão</text><rect x="136.3" y="112.6" width="108.3" height="101.4" rx="6" fill="url(#g4)" class="bar-rect"><title>Fiel: R$ 16,9k</title></rect><text x="190.5" y="104.6" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 16,9k</text><text x="190.5" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Fiel</text><rect x="262.7" y="165.5" width="108.3" height="48.5" rx="6" fill="url(#g4)" class="bar-rect"><title>Promissor: R$ 8,1k</title></rect><text x="316.8" y="157.5" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 8,1k</text><text x="316.8" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Promissor</text><rect x="389.0" y="181.6" width="108.3" height="32.4" rx="6" fill="url(#g4)" class="bar-rect"><title>Em Risco: R$ 5,4k</title></rect><text x="443.2" y="173.6" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 5,4k</text><text x="443.2" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Em Risco</text><rect x="515.3" y="197.3" width="108.3" height="16.7" rx="6" fill="url(#g4)" class="bar-rect"><title>Churn: R$ 2,8k</title></rect><text x="569.5" y="189.3" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 2,8k</text><text x="569.5" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Churn</text><rect x="641.7" y="198.0" width="108.3" height="16.0" rx="6" fill="url(#g4)" class="bar-rect"><title>Hibernando: R$ 2,7k</title></rect><text x="695.8" y="190.0" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 2,7k</text><text x="695.8" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Hibernando</text>
+      </svg>
+    </div>
+    <p style="font-size:12.5px; color:var(--muted-light); margin-top:-10px;">Fonte: coluna <code>ltv_acumulado</code> (Clientes, 15.000 registros), agrupada por <code>segmento_rfm</code>.</p>
+
+    <div class="chart-block">
+      <div class="chart-title">Custo total atual — categorias candidatas à automação (R$)</div>
+      <svg viewBox="0 0 760 260" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g5" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#8575FF"/>
+            <stop offset="100%" stop-color="#4200DB"/>
+          </linearGradient>
+        </defs>
+        <line x1="10" y1="214" x2="750" y2="214" stroke="#e5e2f5" stroke-width="1"/>
+        <rect x="10.0" y="54.0" width="171.5" height="160.0" rx="6" fill="url(#g5)" class="bar-rect"><title>Onde está\nmeu pedido?: R$ 160k</title></rect><text x="95.8" y="46.0" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 160k</text><text x="95.8" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Onde está</text><text x="95.8" y="245.0" text-anchor="middle" font-size="11" fill="#656871">meu pedido?</text><rect x="199.5" y="117.2" width="171.5" height="96.8" rx="6" fill="url(#g5)" class="bar-rect"><title>Defeito: R$ 97k</title></rect><text x="285.2" y="109.2" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 97k</text><text x="285.2" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Defeito</text><rect x="389.0" y="134.5" width="171.5" height="79.5" rx="6" fill="url(#g5)" class="bar-rect"><title>Troca de\nTamanho: R$ 79k</title></rect><text x="474.8" y="126.5" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 79k</text><text x="474.8" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Troca de</text><text x="474.8" y="245.0" text-anchor="middle" font-size="11" fill="#656871">Tamanho</text><rect x="578.5" y="134.9" width="171.5" height="79.1" rx="6" fill="url(#g5)" class="bar-rect"><title>Dúvida\nTécnica: R$ 79k</title></rect><text x="664.2" y="126.9" text-anchor="middle" font-size="12" font-weight="700" fill="#131920">R$ 79k</text><text x="664.2" y="232.0" text-anchor="middle" font-size="11" fill="#656871">Dúvida</text><text x="664.2" y="245.0" text-anchor="middle" font-size="11" fill="#656871">Técnica</text>
+      </svg>
+    </div>
+    <p style="font-size:12.5px; color:var(--muted-light); margin-top:-10px;">Fonte: tickets × custo médio por categoria, nas 4 categorias de maior volume (78% de todo o volume de atendimento).</p>
+  </section>
+
+  <section id="oportunidades">
+    <h2><span class="num-marker">5</span>Oportunidades priorizadas</h2>
+    <table>
+      <tr><th>Oportunidade</th><th>Impacto estimado</th><th>Esforço</th><th>Categoria</th></tr>
+      <tr><td>Automatizar triagem via ChatBot/RAG</td><td>R$251-358 mil/ano</td><td>Baixo-Médio</td><td><span class="badge quickwin">Quick Win</span></td></tr>
+      <tr><td>Realocar orçamento de Marketplace para Influenciador/TikTok</td><td>Ganho de ROAS direcional</td><td>Baixo</td><td><span class="badge quickwin">Quick Win</span></td></tr>
+      <tr><td>Comunicação proativa de rastreio de entrega</td><td>Reduz volume na categoria de maior custo</td><td>Médio</td><td><span class="badge estruturante">Estruturante</span></td></tr>
+      <tr><td>Renegociar prazo com fornecedores de lead time &gt;50 dias</td><td>Redução de SKUs críticos/ruptura</td><td>Médio</td><td><span class="badge estruturante">Estruturante</span></td></tr>
+      <tr><td>Revisar jornada de onboarding (segmento Promissor)</td><td>Redução de atrito nos primeiros 30-60 dias</td><td>Médio</td><td><span class="badge estruturante">Estruturante</span></td></tr>
+      <tr><td>Campanha de retenção para segmento Em Risco</td><td>R$1,77-2,65 Mi em receita protegida</td><td>Médio-Alto</td><td><span class="badge estruturante">Estruturante</span></td></tr>
+      <tr><td>Priorizar reposição de SKUs críticos de maior valor</td><td>Parte dos R$8,65 Mi liberado</td><td>Médio</td><td><span class="badge estruturante">Estruturante</span></td></tr>
+    </table>
+  </section>
+
+  <section id="detalhamento-rag">
+    <h3 style="font-family: var(--font-display); font-weight: 700; font-size:17px; color:var(--primary-dark); margin-top:0;">5.1 Detalhamento do cálculo — automação via ChatBot/RAG</h3>
+    <div class="card">
+      <p>As 4 categorias de maior volume — <strong>"Onde está meu pedido?"</strong>, <strong>"Defeito"</strong>, <strong>"Troca de Tamanho"</strong> e <strong>"Dúvida Técnica"</strong> — são candidatas naturais a um agente com RAG.</p>
+      <table>
+        <tr><th>Categoria</th><th>Tickets</th><th>Custo total atual</th></tr>
+        <tr><td>Onde está meu pedido?</td><td>10.765</td><td>R$159.645</td></tr>
+        <tr><td>Defeito</td><td>6.509</td><td>R$96.594</td></tr>
+        <tr><td>Troca de Tamanho</td><td>5.360</td><td>R$79.328</td></tr>
+        <tr><td>Dúvida Técnica</td><td>5.314</td><td>R$78.913</td></tr>
+        <tr><td><strong>Total</strong></td><td><strong>27.948 (78%)</strong></td><td><strong>R$414.480</strong></td></tr>
+      </table>
+      <p style="margin-top:14px;">Hoje, <strong>22.323 tickets (80%)</strong> ainda passam por canais 7,5x a 22,5x mais caros que o ChatBot (R$2,00/ticket já observado nessas categorias).</p>
+      <p><strong>Cálculo:</strong> custo atual dos 22.323 tickets fora do ChatBot menos o custo se migrados = <strong>R$358.569 de economia estimada</strong>.</p>
+      <div class="callout warning"><strong>Premissa de sensibilidade:</strong> considerando 70-80% de automação efetiva (nem tudo é automatizável), a economia líquida esperada é de <strong>R$251 mil a R$287 mil/ano</strong>.</div>
+    </div>
+  </section>
+
+  <section id="solucoes">
+    <h2><span class="num-marker">6</span>Soluções propostas (módulos de IA)</h2>
+    <table>
+      <tr><th>Módulo</th><th>O que resolve</th><th>Impacto quantificado</th><th>Esforço</th></tr>
+      <tr><td><strong>A — Funil e Eficiência de Canais</strong></td><td>Compara CAC/ROAS/margem entre canais</td><td>Direcional: ROAS 2,91x → 7,63x no valor realocado</td><td>Baixo</td></tr>
+      <tr><td><strong>B — Classificador de atendimento (RAG)</strong></td><td>Responde rastreio/troca/defeito/dúvida técnica</td><td><strong>R$251-358 mil/ano</strong></td><td>Médio</td></tr>
+      <tr><td><strong>C — Motor de priorização de margem</strong></td><td>Ranqueia oportunidades por impacto × esforço</td><td>Organiza R$2-3 Mi/ano + R$8,65 Mi de capital</td><td>Baixo</td></tr>
+      <tr><td><strong>D — Gerador de relatório semanal</strong></td><td>Memo executivo via LLM</td><td>Ganho de produtividade (não quantificado em R$)</td><td>Baixo-Médio</td></tr>
+    </table>
+    <div class="callout">
+      <strong>Recomendação:</strong> Módulo B tem o número mais sólido — calculado com dado real, sem cruzar bases de escala incompatível — e resolve a dor mais visível do diagnóstico. Módulo C pode ser construído em paralelo, como camada fina sobre os números já produzidos.
+    </div>
+  </section>
+
+  <section id="business-case">
+    <h2><span class="num-marker">7</span>Business Case</h2>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="value">R$2,0-3,0 Mi</div><div class="label">Impacto anual defensável (atendimento + retenção)</div></div>
+      <div class="kpi"><div class="value">R$8,65 Mi</div><div class="label">Capital liberável em estoque crítico</div></div>
+      <div class="kpi"><div class="value">R$251-358 mil</div><div class="label">Economia anual em automação de atendimento</div></div>
+      <div class="kpi"><div class="value">3-4 meses</div><div class="label">Payback estimado da automação</div></div>
+    </div>
+    <div class="callout warning">
+      <strong>Limitação de dado:</strong> investimento total em Marketing (R$75,5 Mi) é 4x a receita real (R$18,9 Mi), e Marketing reporta 41,7 Mi de "conversões" contra 27.759 pedidos reais. As duas bases não são reconciliáveis em R$ absoluto — a realocação de marketing é direcional, não dimensionada em R$.
+    </div>
+  </section>
+
+  <section id="dashboard">
+    <h2><span class="num-marker">8</span>Dashboard interativo (Power BI)</h2>
+    <div class="dashboard-embed">
+      Dashboard Power BI será incorporado aqui após publicação (Arquivo → Publicar na Web).<br>
+      <span style="font-size:12px;">Substituir este bloco pelo &lt;iframe&gt; gerado pelo Power BI Service.</span>
+    </div>
+  </section>
+
+  <div class="footer-note">
+    Projeto Vértice · BootCamp Nova Geração · EloGroup 2026 — Artefato de processo gerado a partir de cálculos determinísticos sobre o Data Room simulado. Premissas e limites de dado documentados nas seções correspondentes.
+  </div>
+
+</div>
+</body>
+</html>
