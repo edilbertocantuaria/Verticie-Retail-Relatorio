@@ -349,11 +349,11 @@
 
 <div class="hero">
   <div class="hero-inner">
-    <div class="eyebrow">BootCamp Nova Geração · Projeto Vértice · EloGroup 2026</div>
+    <div class="eyebrow">Estudo de caso · Consultoria de Dados & IA</div>
     <h1>Diagnóstico, evidências e plano de recuperação de margem para a Vértice Retail</h1>
     <p class="lede">Consultoria de dados e IA para responder à diretoria: como recuperar rentabilidade e produtividade nos próximos 90 dias.</p>
     <div class="stat-row">
-      <div class="stat-pill"><div class="num">R$2-3 Mi</div><div class="lbl">Impacto anual defensável</div></div>
+      <div class="stat-pill"><div class="num">R$2,6-4,7 Mi</div><div class="lbl">Impacto anual defensável</div></div>
       <div class="stat-pill"><div class="num">R$8,65 Mi</div><div class="lbl">Capital liberável em estoque</div></div>
       <div class="stat-pill"><div class="num">14</div><div class="lbl">Hipóteses testadas</div></div>
       <div class="stat-pill"><div class="num">7,5x</div><div class="lbl">ChatBot mais barato que canais humanos</div></div>
@@ -400,8 +400,8 @@
         <h3>Protótipo ou demonstração de IA</h3>
         <p>Analisador de funil, classificador, automação, gerador de relatório ou priorizador demonstrável.</p>
       </div>
-      <div class="deliverable-card status-partial">
-        <div class="deliverable-status">Parcial</div>
+      <div class="deliverable-card status-done">
+        <div class="deliverable-status">Concluído</div>
         <h3>Business case</h3>
         <p>Estimativa de impacto financeiro e operacional: receita protegida, margem recuperada, economia, esforço e payback.</p>
       </div>
@@ -610,7 +610,7 @@
       <tr><th>Módulo</th><th>O que resolve</th><th>Impacto quantificado</th><th>Esforço</th></tr>
       <tr><td><strong>A — Funil e Eficiência de Canais</strong></td><td>Compara CAC/ROAS/margem entre canais</td><td>Direcional: ROAS 2,91x → 7,63x no valor realocado</td><td>Baixo</td></tr>
       <tr><td><strong>B — Classificador de atendimento (RAG)</strong></td><td>Responde rastreio/troca/defeito/dúvida técnica</td><td><strong>R$251-358 mil/ano</strong></td><td>Médio</td></tr>
-      <tr><td><strong>C — Motor de priorização de margem</strong></td><td>Ranqueia oportunidades por impacto × esforço</td><td>Organiza R$2-3 Mi/ano + R$8,65 Mi de capital</td><td>Baixo</td></tr>
+      <tr><td><strong>C — Motor de priorização de margem</strong></td><td>Ranqueia oportunidades por impacto × esforço</td><td>Organiza R$2,6-4,7 Mi/ano + R$8,65 Mi de capital</td><td>Baixo</td></tr>
       <tr><td><strong>D — Gerador de relatório semanal</strong></td><td>Memo executivo via LLM</td><td>Ganho de produtividade (não quantificado em R$)</td><td>Baixo-Médio</td></tr>
     </table>
     <div class="callout">
@@ -621,12 +621,24 @@
   <section id="business-case">
     <h2><span class="num-marker">7</span>Business Case</h2>
     <div class="kpi-grid">
-      <div class="kpi"><div class="value">R$2,0-3,0 Mi</div><div class="label">Impacto anual defensável (atendimento + retenção)</div></div>
+      <div class="kpi"><div class="value">R$2,6-4,7 Mi</div><div class="label">Impacto anual defensável (atendimento + retenção + margem recuperada)</div></div>
       <div class="kpi"><div class="value">R$8,65 Mi</div><div class="label">Capital liberável em estoque crítico</div></div>
-      <div class="kpi"><div class="value">R$251-358 mil</div><div class="label">Economia anual em automação de atendimento</div></div>
-      <div class="kpi"><div class="value">3-4 meses</div><div class="label">Payback estimado da automação</div></div>
+      <div class="kpi"><div class="value">R$268-676 mil</div><div class="label">Esforço total de implementação estimado</div></div>
+      <div class="kpi"><div class="value">Imediato-4 meses</div><div class="label">Payback por iniciativa (ver tabela-síntese)</div></div>
     </div>
-    <div class="callout warning">
+
+    <h3 style="font-family: var(--font-display); font-weight:700; font-size:16px; color:var(--ink); margin:28px 0 12px;">Tabela-síntese consolidada</h3>
+    <table>
+      <tr><th>Iniciativa</th><th>Impacto anual</th><th>Esforço</th><th>Payback</th><th>Janela</th></tr>
+      <tr><td>Automação de atendimento (RAG)</td><td>R$251-358 mil</td><td>R$30-80 mil</td><td>3-4 meses</td><td>60-90 dias</td></tr>
+      <tr><td>Correção de margem do Marketplace</td><td>R$117,5 mil</td><td>Baixo (renegociação)</td><td>Imediato</td><td>30 dias</td></tr>
+      <tr><td>Retenção "Em Risco"</td><td>R$1,77-2,65 Mi protegidos</td><td>R$65-163 mil</td><td>ROI 11x-27x</td><td>60-90 dias</td></tr>
+      <tr><td>Liquidação de estoque crítico (cenário 20%)</td><td>R$940 mil margem + capital liberado</td><td>R$173-433 mil</td><td>Positivo no cenário</td><td>90 dias</td></tr>
+      <tr><td>Realocação de marketing</td><td>Direcional (não dimensionado)</td><td>Zero</td><td>Imediato</td><td>30 dias</td></tr>
+    </table>
+    <p style="font-size:12.5px; color:var(--muted-light); margin-top:10px;">Correção de margem do Marketplace e realocação de marketing são os quick wins financeiros reais — payback imediato, sem investimento novo. Automação e retenção têm esforço de implementação, mas ROI muito favorável. Estoque é a iniciativa mais lenta de capturar, mas de maior volume de capital.</p>
+
+    <div class="callout warning" style="margin-top:20px;">
       <strong>Limitação de dado:</strong> investimento total em Marketing (R$75,5 Mi) é 4x a receita real (R$18,9 Mi), e Marketing reporta 41,7 Mi de "conversões" contra 27.759 pedidos reais. As duas bases não são reconciliáveis em R$ absoluto — a realocação de marketing é direcional, não dimensionada em R$.
     </div>
   </section>
@@ -634,12 +646,12 @@
   <section id="dashboard">
     <h2><span class="num-marker">8</span>Dashboard interativo (Power BI)</h2>
     <div style="display: flex; justify-content: center; margin-bottom: 24px;">
-      <iframe title="elogroup_case" width="100%" height="600" src="https://app.powerbi.com/view?r=eyJrIjoiYTU1MzA4NmQtYTI2ZC00NjkyLWE1NmMtODc5ZWRhNjhlY2RiIiwidCI6ImVjMzU5YmExLTYzMGItNGQyYi1iODMzLWM4ZTZkNDhmODA1OSJ9" frameborder="0" allowFullScreen="true" style="border: none; border-radius: 14px;"></iframe>
+      <iframe title="vertice_retail_dashboard" width="100%" height="600" src="https://app.powerbi.com/view?r=eyJrIjoiYTU1MzA4NmQtYTI2ZC00NjkyLWE1NmMtODc5ZWRhNjhlY2RiIiwidCI6ImVjMzU5YmExLTYzMGItNGQyYi1iODMzLWM4ZTZkNDhmODA1OSJ9" frameborder="0" allowFullScreen="true" style="border: none; border-radius: 14px;"></iframe>
     </div>
   </section>
 
   <div class="footer-note">
-    Projeto Vértice · BootCamp Nova Geração · EloGroup 2026 — Artefato de processo gerado a partir de cálculos determinísticos sobre o Data Room simulado. Premissas e limites de dado documentados nas seções correspondentes.
+    Projeto Vértice — Artefato de processo gerado a partir de cálculos determinísticos sobre um Data Room simulado. Premissas e limites de dado documentados nas seções correspondentes.
   </div>
 
 </div>
